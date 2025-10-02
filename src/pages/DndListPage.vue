@@ -43,7 +43,7 @@ watch(
   () => key.value,
   (k) => {
     if (!allListEndpoints.includes(k)) {
-      router.replace('/');
+      void router.replace('/');
     }
   },
   { immediate: true }

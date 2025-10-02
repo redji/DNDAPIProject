@@ -4,6 +4,7 @@ export const config: Options.Testrunner = {
   runner: 'local',
   specs: ['./test/e2e/**/*.e2e.ts'],
   maxInstances: 1,
+  baseUrl: 'http://localhost:9000',
   capabilities: [{
     browserName: 'chrome',
     'goog:chromeOptions': {
@@ -18,9 +19,10 @@ export const config: Options.Testrunner = {
     tsNodeOpts: {
       transpileOnly: true,
       project: './tsconfig.json',
+      files: ['./test/e2e/wdio-globals.d.ts'],
     },
   },
-};
+} as Options.Testrunner;
 
 
 

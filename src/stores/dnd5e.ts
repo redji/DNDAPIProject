@@ -90,7 +90,7 @@ export const useDnd5eStore = defineStore('dnd5e', {
       try {
         const { data } = await dnd5eApi.get<ApiListResponse>(`/${key}`);
         bucket.data = data;
-      } catch (err) {
+      } catch {
         bucket.error = `Failed to load ${key}`;
       } finally {
         bucket.loading = false;
