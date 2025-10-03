@@ -10,12 +10,16 @@
     </div>
 
     <div v-if="state.error" class="q-mb-md">
-      <q-banner class="bg-negative text-white">{{ state.error }}</q-banner>
+      <q-banner class="bg-negative text-white" data-testid="error-banner">{{ state.error }}</q-banner>
     </div>
 
-    <q-skeleton v-if="state.loading" type="rect" class="q-mb-md" height="24px" />
+    <div v-if="state.loading" class="q-mb-md">
+      <q-skeleton type="rect" height="24px" data-testid="loading-skeleton" />
+      <q-skeleton type="rect" height="24px" class="q-mt-sm" />
+      <q-skeleton type="rect" height="24px" class="q-mt-sm" />
+    </div>
 
-    <q-list bordered separator>
+    <q-list v-if="filtered.length > 0" bordered separator>
       <q-item v-for="item in filtered" :key="item.index" clickable>
         <q-item-section>
           <q-item-label>{{ item.name }}</q-item-label>
@@ -23,6 +27,14 @@
         </q-item-section>
       </q-item>
     </q-list>
+    
+    <div v-else-if="!state.loading && !state.error" class="text-center q-pa-lg">
+      <q-icon name="search_off" size="3em" color="grey-5" />
+      <div class="text-h6 q-mt-md text-grey-6">No items found</div>
+      <div class="text-caption text-grey-5">
+        {{ query ? 'Try adjusting your search terms' : 'No data available for this endpoint' }}
+      </div>
+    </div>
   </q-page>
   
 </template>
@@ -49,10 +61,17 @@ watch(
   { immediate: true }
 );
 
-const state = computed(() => store.lists[key.value]);
+const state = computed(() => {
+  const endpointKey = key.value;
+  if (!allListEndpoints.includes(endpointKey)) {
+    return { loading: false, error: 'Invalid endpoint', data: null };
+  }
+  return store.lists[endpointKey];
+});
+
 const query = ref('');
 
-const items = computed(() => state.value.data?.results ?? []);
+const items = computed(() => state.value?.data?.results ?? []);
 const filtered = computed(() => {
   const q = query.value.trim().toLowerCase();
   if (!q) return items.value;
@@ -60,11 +79,15 @@ const filtered = computed(() => {
 });
 
 async function refresh() {
-  await store.fetchList(key.value);
+  const endpointKey = key.value;
+  if (allListEndpoints.includes(endpointKey)) {
+    await store.fetchList(endpointKey);
+  }
 }
 
 onMounted(async () => {
-  if (!state.value.data && !state.value.loading) {
+  const endpointKey = key.value;
+  if (allListEndpoints.includes(endpointKey) && !state.value?.data && !state.value?.loading) {
     await refresh();
   }
 });

@@ -8,7 +8,7 @@ export const config: Options.Testrunner = {
   capabilities: [{
     browserName: 'chrome',
     'goog:chromeOptions': {
-      args: ['--headless=new', '--disable-gpu', '--window-size=1280,800'],
+      args: ['--window-size=1280,800', '--start-maximized'],
     },
   }],
   logLevel: 'info',

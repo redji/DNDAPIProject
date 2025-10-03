@@ -19,7 +19,9 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <ErrorBoundary>
+        <router-view />
+      </ErrorBoundary>
     </q-page-container>
   </q-layout>
 </template>
@@ -27,6 +29,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue';
+import ErrorBoundary from 'components/ErrorBoundary.vue';
 
 const linksList: EssentialLinkProps[] = [
   {

@@ -6,13 +6,13 @@
     </div>
 
     <q-list bordered separator>
-      <q-item v-for="key in filteredKeys" :key="key" clickable :to="{ name: 'dnd-list', params: { key } }">
+      <q-item v-for="key in filteredKeys" :key="key" clickable :to="{ name: 'dnd-list', params: { key } }" data-testid="endpoint-item">
         <q-item-section>
           <q-item-label class="text-capitalize">{{ key.replace('-', ' ') }}</q-item-label>
           <q-item-label caption>{{ `/api/2014/${key}` }}</q-item-label>
         </q-item-section>
         <q-item-section side>
-          <q-icon name="chevron_right" />
+          <q-icon name="chevron_right" data-testid="chevron-icon" />
         </q-item-section>
       </q-item>
     </q-list>
@@ -25,7 +25,7 @@ import { allListEndpoints } from 'src/stores/dnd5e';
 
 const search = ref('');
 const filteredKeys = computed(() => {
-  const q = search.value.trim().toLowerCase();
+  const q = search.value?.trim().toLowerCase() || '';
   if (!q) return allListEndpoints;
   return allListEndpoints.filter((k) => k.includes(q));
 });

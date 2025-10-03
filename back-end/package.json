@@ -1,0 +1,44 @@
+{
+  "name": "dnd5e-backend",
+  "version": "1.0.0",
+  "description": "D&D 5e SRD Backend Server with gRPC",
+  "main": "build/dnd5e-backend",
+  "scripts": {
+    "build": "cmake -B build -S . && cmake --build build --config Release",
+    "build:debug": "cmake -B build -S . -DCMAKE_BUILD_TYPE=Debug && cmake --build build --config Debug",
+    "clean": "rm -rf build",
+    "install": "cmake --install build --prefix /usr/local",
+    "test": "cd build && ctest --output-on-failure",
+    "run": "build/dnd5e-backend",
+    "run:dev": "build/dnd5e-backend --address 0.0.0.0:50051",
+    "proto": "protoc --grpc_out=. --cpp_out=. --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` proto/dnd5e.proto",
+    "deps:install": "sudo apt-get update && sudo apt-get install -y build-essential cmake pkg-config libprotobuf-dev protobuf-compiler libgrpc++-dev protobuf-compiler-grpc libcurl4-openssl-dev nlohmann-json3-dev",
+    "docker:build": "docker build -t dnd5e-backend .",
+    "docker:run": "docker run -p 50051:50051 dnd5e-backend"
+  },
+  "keywords": [
+    "dnd",
+    "dungeons-and-dragons",
+    "grpc",
+    "cpp",
+    "backend",
+    "api"
+  ],
+  "author": "D&D 5e Backend Team",
+  "license": "MIT",
+  "devDependencies": {
+    "grpc-tools": "^1.12.4"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/dnd5e-backend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/dnd5e-backend/issues"
+  },
+  "homepage": "https://github.com/your-org/dnd5e-backend#readme"
+}
+

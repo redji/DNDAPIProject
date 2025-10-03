@@ -84,13 +84,29 @@ export const useDnd5eStore = defineStore('dnd5e', {
 
   actions: {
     async fetchList(key: ListEndpointKey): Promise<void> {
+      if (!allListEndpoints.includes(key)) {
+        console.error(`Invalid endpoint key: ${key}`);
+        return;
+      }
+      
       const bucket = this.lists[key];
       bucket.loading = true;
       bucket.error = null;
       try {
         const { data } = await dnd5eApi.get<ApiListResponse>(`/${key}`);
+        
+        // Validate API response structure
+        if (!data || typeof data !== 'object') {
+          throw new Error('Invalid API response format');
+        }
+        
+        if (typeof data.count !== 'number' || !Array.isArray(data.results)) {
+          throw new Error('Invalid API response structure');
+        }
+        
         bucket.data = data;
-      } catch {
+      } catch (error) {
+        console.error(`Failed to fetch ${key}:`, error);
         bucket.error = `Failed to load ${key}`;
       } finally {
         bucket.loading = false;
