@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  mariadb:
+    image: mariadb:11.4
+    container_name: dnd5e-mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpass}
+      MARIADB_DATABASE: ${DB_NAME:-dnd5e}
+      MARIADB_USER: ${DB_USER:-dnduser}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-dndpass}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./sql/init:/docker-entrypoint-initdb.d
+
+volumes:
+  db_data:
+
+
+

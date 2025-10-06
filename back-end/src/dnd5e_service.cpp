@@ -16,6 +16,8 @@ grpc::Status Dnd5eServiceImpl::GetEndpoints(
     const GetEndpointsRequest* request,
     GetEndpointsResponse* response) {
     
+    (void)context;
+    (void)request;
     try {
         auto endpoints = GetAllEndpoints();
         
@@ -37,6 +39,7 @@ grpc::Status Dnd5eServiceImpl::GetList(
     const GetListRequest* request,
     GetListResponse* response) {
     
+    (void)context;
     try {
         const std::string& endpoint = request->endpoint();
         
@@ -79,6 +82,7 @@ grpc::Status Dnd5eServiceImpl::GetItem(
     const GetItemRequest* request,
     GetItemResponse* response) {
     
+    (void)context;
     try {
         const std::string& endpoint = request->endpoint();
         const std::string& index = request->index();
@@ -118,6 +122,7 @@ grpc::Status Dnd5eServiceImpl::SearchItems(
     const SearchItemsRequest* request,
     SearchItemsResponse* response) {
     
+    (void)context;
     try {
         const std::string& query = request->query();
         
@@ -156,6 +161,8 @@ grpc::Status Dnd5eServiceImpl::HealthCheck(
     const HealthCheckRequest* request,
     HealthCheckResponse* response) {
     
+    (void)context;
+    (void)request;
     try {
         // Check if API client is working
         auto endpoints = api_client_->GetEndpoints();

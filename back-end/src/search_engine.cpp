@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cmath>
+#include <iostream>
 
 namespace dnd5e {
 
@@ -9,12 +10,12 @@ SearchEngine::SearchEngine(std::shared_ptr<ApiClient> api_client)
     : api_client_(api_client) {
 }
 
-std::vector<SearchResult> SearchEngine::Search(
+std::vector<SearchHit> SearchEngine::Search(
     const std::string& query,
     const std::vector<std::string>& endpoints,
     int max_results) {
     
-    std::vector<SearchResult> all_results;
+    std::vector<SearchHit> all_results;
     
     // If no specific endpoints provided, search all
     std::vector<std::string> search_endpoints = endpoints;
@@ -29,7 +30,7 @@ std::vector<SearchResult> SearchEngine::Search(
     
     // Sort by relevance score (highest first)
     std::sort(all_results.begin(), all_results.end(),
-        [](const SearchResult& a, const SearchResult& b) {
+        [](const SearchHit& a, const SearchHit& b) {
             return a.relevance_score > b.relevance_score;
         });
     
@@ -41,12 +42,12 @@ std::vector<SearchResult> SearchEngine::Search(
     return all_results;
 }
 
-std::vector<SearchResult> SearchEngine::SearchInEndpoint(
+std::vector<SearchHit> SearchEngine::SearchInEndpoint(
     const std::string& query,
     const std::string& endpoint,
     int max_results) {
     
-    std::vector<SearchResult> results;
+    std::vector<SearchHit> results;
     auto items = GetEndpointData(endpoint);
     
     for (const auto& item : items) {
@@ -58,7 +59,7 @@ std::vector<SearchResult> SearchEngine::SearchInEndpoint(
     
     // Sort by relevance score
     std::sort(results.begin(), results.end(),
-        [](const SearchResult& a, const SearchResult& b) {
+        [](const SearchHit& a, const SearchHit& b) {
             return a.relevance_score > b.relevance_score;
         });
     
@@ -165,7 +166,7 @@ std::vector<ApiClient::ApiItem> SearchEngine::GetEndpointData(const std::string&
     }
 }
 
-std::optional<SearchResult> SearchEngine::SearchInItem(
+std::optional<SearchHit> SearchEngine::SearchInItem(
     const ApiClient::ApiItem& item,
     const std::string& query,
     const std::string& endpoint) const {
@@ -188,7 +189,7 @@ std::optional<SearchResult> SearchEngine::SearchInItem(
         return std::nullopt;
     }
     
-    SearchResult result;
+    SearchHit result;
     result.item = item;
     result.matched_field = matched_field;
     result.relevance_score = CalculateRelevanceScore(item, query, matched_field);

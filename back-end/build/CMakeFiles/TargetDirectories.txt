@@ -1,0 +1,8 @@
+/home/dev/quasar-project/back-end/build/CMakeFiles/dnd5e-backend.dir
+/home/dev/quasar-project/back-end/build/CMakeFiles/test.dir
+/home/dev/quasar-project/back-end/build/CMakeFiles/edit_cache.dir
+/home/dev/quasar-project/back-end/build/CMakeFiles/rebuild_cache.dir
+/home/dev/quasar-project/back-end/build/CMakeFiles/list_install_components.dir
+/home/dev/quasar-project/back-end/build/CMakeFiles/install.dir
+/home/dev/quasar-project/back-end/build/CMakeFiles/install/local.dir
+/home/dev/quasar-project/back-end/build/CMakeFiles/install/strip.dir

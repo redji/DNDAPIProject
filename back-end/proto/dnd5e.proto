@@ -2,28 +2,15 @@ syntax = "proto3";
 
 package dnd5e;
 
-// Service definition for D&D 5e SRD API
 service Dnd5eService {
-  // Get list of all available endpoints
   rpc GetEndpoints(GetEndpointsRequest) returns (GetEndpointsResponse);
-  
-  // Get list of items for a specific endpoint
   rpc GetList(GetListRequest) returns (GetListResponse);
-  
-  // Get detailed information about a specific item
   rpc GetItem(GetItemRequest) returns (GetItemResponse);
-  
-  // Search items across all endpoints
   rpc SearchItems(SearchItemsRequest) returns (SearchItemsResponse);
-  
-  // Get server health status
   rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
 }
 
-// Request/Response messages
-message GetEndpointsRequest {
-  // Empty request
-}
+message GetEndpointsRequest {}
 
 message GetEndpointsResponse {
   repeated string endpoints = 1;
@@ -32,8 +19,8 @@ message GetEndpointsResponse {
 
 message GetListRequest {
   string endpoint = 1;
-  int32 page = 2;        // For pagination
-  int32 page_size = 3;   // Items per page
+  int32 page = 2;
+  int32 page_size = 3;
 }
 
 message GetListResponse {
@@ -52,12 +39,12 @@ message GetItemRequest {
 
 message GetItemResponse {
   ApiItem item = 1;
-  string raw_data = 2;  // JSON string of the full item data
+  string raw_data = 2;
 }
 
 message SearchItemsRequest {
   string query = 1;
-  repeated string endpoints = 2;  // Optional: limit search to specific endpoints
+  repeated string endpoints = 2;
   int32 max_results = 3;
 }
 
@@ -67,9 +54,7 @@ message SearchItemsResponse {
   int32 total_found = 3;
 }
 
-message HealthCheckRequest {
-  // Empty request
-}
+message HealthCheckRequest {}
 
 message HealthCheckResponse {
   enum ServingStatus {
@@ -82,7 +67,6 @@ message HealthCheckResponse {
   int64 timestamp = 3;
 }
 
-// Data structures
 message ApiItem {
   string index = 1;
   string name = 2;
@@ -92,6 +76,8 @@ message ApiItem {
 
 message SearchResult {
   ApiItem item = 1;
-  string matched_field = 2;  // Which field matched the search
-  float relevance_score = 3; // Search relevance score
+  string matched_field = 2;
+  float relevance_score = 3;
 }
+
+

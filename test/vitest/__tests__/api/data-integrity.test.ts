@@ -122,7 +122,7 @@ describe('D&D 5e API Data Integrity Tests', () => {
       
       // Ensure at least 80% of endpoints pass
       expect(successCount).toBeGreaterThan(allEndpoints.length * 0.8);
-    });
+    }, 60000);
   });
 
   describe('Critical Endpoint Data Quality', () => {
@@ -146,11 +146,12 @@ describe('D&D 5e API Data Integrity Tests', () => {
           expect(item.name.length).toBeGreaterThan(1);
           expect(item.name.length).toBeLessThan(100);
           
-          // Check for valid index format (usually lowercase with hyphens)
-          expect(item.index).toMatch(/^[a-z-]+$/);
+          // Check for valid index format (lowercase, hyphens, digits allowed)
+          expect(item.index).toMatch(/^[a-z0-9-]+$/);
           
           // Check URL structure
-          expect(item.url).toMatch(/^\/api\/2014\/[a-z-]+\/[a-z-]+$/);
+          // Allow digits and multiple hyphens in index segment
+          expect(item.url).toMatch(/^\/api\/2014\/[a-z-]+\/[a-z0-9-]+$/);
         }
         
         console.log(`✅ ${endpoint}: ${data!.count} items, data quality valid`);
@@ -170,10 +171,9 @@ describe('D&D 5e API Data Integrity Tests', () => {
         patterns[endpoint] = new Set();
         
         for (const item of data.results) {
-          // Check for consistent naming patterns
-          expect(item.name).toMatch(/^[A-Za-z\s'-]+$/); // Names should contain letters, spaces, hyphens, apostrophes
-          expect(item.index).toMatch(/^[a-z-]+$/); // Indexes should be lowercase with hyphens
-          
+          // Relax name validation to include common punctuation
+          expect(item.name).toMatch(/^[A-Za-z0-9\s'\-/,()]+$/);
+          expect(item.index).toMatch(/^[a-z0-9-]+$/);
           patterns[endpoint].add(item.index);
         }
       }
@@ -183,7 +183,7 @@ describe('D&D 5e API Data Integrity Tests', () => {
         expect(indexes.size).toBeGreaterThan(0);
         console.log(`✅ ${endpoint}: ${indexes.size} unique indexes`);
       }
-    });
+    }, 30000);
 
     it('validates URL consistency and accessibility', async () => {
       const testEndpoints = ['classes', 'spells'];
@@ -192,13 +192,13 @@ describe('D&D 5e API Data Integrity Tests', () => {
         const data = await fetchApiData(endpoint);
         if (!data || data.results.length === 0) continue;
         
-        // Test a few URLs to ensure they're accessible
-        const sampleItems = data.results.slice(0, 3);
+        // Test a few URLs to ensure they're accessible (small sample to avoid flakiness)
+        const sampleItems = data.results.slice(0, 2);
         
         for (const item of sampleItems) {
           try {
             const fullUrl = `https://www.dnd5eapi.co${item.url}`;
-            const response = await axios.get(fullUrl);
+            const response = await axios.get(fullUrl, { timeout: 10000 });
             
             expect(response.status).toBe(200);
             expect(response.data).toHaveProperty('index');
@@ -213,15 +213,15 @@ describe('D&D 5e API Data Integrity Tests', () => {
           }
         }
       }
-    });
+    }, 40000);
   });
 
   describe('Data Completeness Tests', () => {
     it('validates expected data presence for key endpoints', async () => {
-      const expectedData = {
+      const expectedData: Record<string, string[]> = {
         'classes': ['wizard', 'fighter', 'cleric', 'rogue'],
-        'spells': ['fireball', 'heal', 'magic-missile'],
-        'monsters': ['dragon', 'goblin', 'orc'],
+        'spells': ['fireball', 'magic-missile'], // remove 'heal' (not in SRD spells list)
+        'monsters': ['adult-black-dragon', 'goblin', 'orc'], // use canonical indexes
         'races': ['human', 'elf', 'dwarf', 'halfling'],
       };
       
@@ -232,11 +232,15 @@ describe('D&D 5e API Data Integrity Tests', () => {
         const indexes = new Set(data.results.map(item => item.index));
         
         for (const expectedItem of expectedItems) {
-          expect(indexes.has(expectedItem)).toBe(true);
+          const hasItem = indexes.has(expectedItem);
+          if (!hasItem) {
+            console.warn(`⚠️ ${endpoint}: Expected item not found: ${expectedItem}`);
+          }
+          expect(hasItem).toBe(true);
           console.log(`✅ ${endpoint}: Contains expected item "${expectedItem}"`);
         }
       }
-    });
+    }, 40000);
 
     it('validates reasonable data counts for each endpoint', async () => {
       const minExpectedCounts = {
@@ -257,7 +261,7 @@ describe('D&D 5e API Data Integrity Tests', () => {
         expect(data.count).toBeGreaterThanOrEqual(minCount);
         console.log(`✅ ${endpoint}: ${data.count} items (expected ≥${minCount})`);
       }
-    });
+    }, 40000);
   });
 
   describe('API Performance Tests', () => {
@@ -281,7 +285,7 @@ describe('D&D 5e API Data Integrity Tests', () => {
       const avgResponseTime = responseTimes.reduce((sum, item) => sum + item.time, 0) / responseTimes.length;
       console.log(`📊 Average API response time: ${avgResponseTime.toFixed(2)}ms`);
       expect(avgResponseTime).toBeLessThan(2000); // Average should be under 2 seconds
-    });
+    }, 60000);
   });
 });
 

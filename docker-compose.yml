@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./back-end
+    container_name: dnd5e-backend
+    ports:
+      - "50051:50051"
+    depends_on:
+      - mariadb
+    environment:
+      - DB_HOST=mariadb
+      - DB_PORT=3306
+      - DB_NAME=${DB_NAME:-dnd5e}
+      - DB_USER=${DB_USER:-dnduser}
+      - DB_PASSWORD=${DB_PASSWORD:-dndpass}
+    restart: unless-stopped
+
+  mariadb:
+    image: mariadb:11.4
+    container_name: dnd5e-mariadb
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpass}
+      MARIADB_DATABASE: ${DB_NAME:-dnd5e}
+      MARIADB_USER: ${DB_USER:-dnduser}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-dndpass}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./back-end/sql/init:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+    restart: unless-stopped
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./docker/nginx/Dockerfile
+    container_name: dnd5e-nginx
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  db_data:
+
+
+

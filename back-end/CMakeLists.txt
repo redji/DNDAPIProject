@@ -17,6 +17,7 @@ find_package(Protobuf REQUIRED)
 find_package(gRPC REQUIRED)
 find_package(Threads REQUIRED)
 find_package(nlohmann_json REQUIRED)
+find_package(CURL REQUIRED)
 
 # Include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -24,7 +25,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # Generate protobuf and gRPC files
 set(PROTO_FILES
-    proto/dnd5e.proto
+    ${CMAKE_CURRENT_SOURCE_DIR}/proto/dnd5e.proto
 )
 
 set(PROTO_SRCS)
@@ -49,11 +50,12 @@ foreach(PROTO_FILE ${PROTO_FILES})
     add_custom_command(
         OUTPUT ${PROTO_SRC} ${PROTO_HDR} ${GRPC_SRC} ${GRPC_HDR}
         COMMAND protobuf::protoc
-        ARGS --grpc_out=${CMAKE_CURRENT_BINARY_DIR}
+        ARGS -I ${CMAKE_CURRENT_SOURCE_DIR}/proto
+             --grpc_out=${CMAKE_CURRENT_BINARY_DIR}
              --cpp_out=${CMAKE_CURRENT_BINARY_DIR}
              --plugin=protoc-gen-grpc=$<TARGET_FILE:gRPC::grpc_cpp_plugin>
-             ${CMAKE_CURRENT_SOURCE_DIR}/${PROTO_FILE}
-        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${PROTO_FILE}
+             ${PROTO_FILE}
+        DEPENDS ${PROTO_FILE}
         COMMENT "Generating protobuf and gRPC files for ${PROTO_FILE}"
     )
 endforeach()
@@ -85,8 +87,10 @@ add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 # Link libraries
 target_link_libraries(${PROJECT_NAME}
     gRPC::grpc++
+    gRPC::grpc++_reflection
     protobuf::libprotobuf
     nlohmann_json::nlohmann_json
+    CURL::libcurl
     Threads::Threads
 )
 

@@ -20,7 +20,7 @@
     </div>
 
     <q-list v-if="filtered.length > 0" bordered separator>
-      <q-item v-for="item in filtered" :key="item.index" clickable>
+      <q-item v-for="item in filtered" :key="item.index" clickable :to="{ name: 'dnd-detail', params: { key, index: item.index } }">
         <q-item-section>
           <q-item-label>{{ item.name }}</q-item-label>
           <q-item-label caption>{{ item.index }}</q-item-label>

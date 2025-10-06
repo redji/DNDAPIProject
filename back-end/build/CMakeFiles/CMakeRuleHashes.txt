@@ -1,0 +1,2 @@
+# Hashes of file build rules.
+5b994579e0273040ac460fa85991e484 dnd5e.pb.cc
